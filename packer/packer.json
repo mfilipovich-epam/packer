@@ -1,0 +1,32 @@
+{
+  "builders": [
+    {
+      "type": "googlecompute",
+      "account_file": "/home/devops/terraform/ansible/my-epamlab0012-ansible-f219264cf757.json",
+      "project_id": "my-epamlab0012-ansible",
+      "source_image": "ubuntu-1804-bionic-v20200317",
+      "ssh_username": "devops",
+      "zone": "us-central1-c",
+      "image_description": "msg-service image",
+      "image_name": "msg-service-image"
+    }
+  ], 
+  "provisioners":[
+    {
+      "type": "ansible",
+      "playbook_file": "./practice/msg-service.yml",
+      "extra_arguments":  [
+        "--become"
+      ],
+      "ansible_env_vars":  [
+        "PYTHONUNBUFFERED=1",
+        "ANSIBLE_FORCE_COLOR=1",
+        "ANSIBLE_STDOUT_CALLBACK=debug",
+        "ANSIBLE_HOST_KEY_CHECKING=False",
+        "ANSIBLE_RETRY_FILES_ENABLED=False",
+        "ANSIBLE_LOCAL_TEMP=$HOME/.ansible/tmp",
+        "ANSIBLE_REMOTE_TEMP=$HOME/.ansible/tmp"
+      ]
+    }
+  ]
+}

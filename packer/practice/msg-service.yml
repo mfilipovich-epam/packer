@@ -1,0 +1,69 @@
+- name: ansible_day1
+  become: yes
+  become_user: root
+  hosts: all
+
+  tasks:
+  - name: Ensure group "msg-service" exists
+    group:
+      name: msg-service
+      state: present
+
+  - name: Create "msg-service" user
+    user:
+      name: msg-service
+      group: msg-service
+      append: yes
+
+
+  - name: Create a directory "bin"
+    file:
+      path: /opt/msg-service/bin/
+      state: directory
+      owner: msg-service
+      group: msg-service
+
+
+  - name: Create a directory "conf"
+    file:
+      path: /opt/msg-service/conf/
+      state: directory
+      owner: msg-service
+      group: msg-service
+
+  - name: Download msg-service
+    get_url:
+      url: https://playpit-labs-assets.s3-eu-west-1.amazonaws.com/msg-service/msg-server
+      dest: /opt/msg-service/bin/
+      mode: '0755'
+
+  - name: Copying conf file
+    copy:
+      src: msg-service.conf
+      dest: /opt/msg-service/conf/msg-service.conf
+      owner: msg-service
+      group: msg-service
+      mode: '0644'
+
+  - name: Copying systemd file
+    copy:
+      src: msg-service.service
+      dest: /lib/systemd/system/msg-service.service
+      owner: root
+      group: root
+      mode: '0644'
+    notify:
+    - restart service
+
+  - name: run service
+    systemd:
+      state: started
+      name: msg-service.service
+      enabled: yes
+
+  handlers:
+  - name: restart service
+    systemd:
+      state: restarted
+      name: msg-service.service
+      daemon_reload: yes
